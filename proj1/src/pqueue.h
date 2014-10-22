@@ -1,8 +1,11 @@
 #ifndef PQUEUE_H
 #define PQUEUE_H 1
 
+#include "uthread.h"
+#include <ucontext.h>
+
 typedef struct p_queue_node{
-	int* queue;
+	uthread_t** queue;
 	int size;
 	int max_size;
 } pqueue_t;
@@ -21,7 +24,7 @@ pqueue_t* init_queue(int size);
  *		@param data the data to be added
  *		@param priority the priority of the data to be added
  */
-void add(pqueue_t* pqueue, int data);
+void enqueue(pqueue_t* pqueue, ucontext_t* context, int priority);
 
 /**
  *  Returns the front of the priority queue but does not remove it
@@ -29,7 +32,7 @@ void add(pqueue_t* pqueue, int data);
  *      @param pqueue the root of the priority queue
  *      @return the top of the queue
  */
-int peek(pqueue_t* pqueue);
+uthread_t* peek(pqueue_t* pqueue);
 
 /**
  *  Returns the top of the priority queue and refreshes the queue to have the new highest priority at the top
@@ -37,6 +40,6 @@ int peek(pqueue_t* pqueue);
  *      @param pqueue the root of the priority queue
  *      @return the top of the queue
  */
-int remove(pqueue_t* pqueue);
+uthread_t* dequeue(pqueue_t* pqueue);
 
 #endif

@@ -1,23 +1,37 @@
 #include <stdio.h>
-#include <sched.h>
-#include <linux/sched.h>
-#include <unistd.h>
+#include "uthread.h"
 #include <stdlib.h>
-#include <fcntl.h>
 
-#define _GNU_SOURCE
-
-int runOnAThread();
+void prior1();
+void prior2();
+void prior3();
+void prior4();
 
 int main(int argc, char * argv[]){
-    void * child_stack;
-    child_stack = (void*)malloc(16384);
-    child_stack += 16383; //BECAUSE STACK GOES BACKWARD
-    clone(runOnAThread, child_stack, CLONE_VM|CLONE_FILES, NULL);
-    sleep(1);
-    printf("IN THE MAIN METHOD\n");
+	system_init(1);
+	uthread_create(prior1);
+	uthread_create(prior2);
+	uthread_create(prior3);
+	uthread_create(prior4);
 }
 
-int runOnAThread(){
-    printf("IN THE THREAD\n");
+void prior1(){
+	sleep(1);
+	printf("Priority 1\n");
+	uthread_exit();
+}
+void prior2(){
+	sleep(1);
+	printf("Priority 2\n");
+	uthread_exit();
+}
+void prior3(){
+	sleep(1);
+	printf("Priority 3\n");
+	uthread_exit();
+}
+void prior4(){
+	sleep(1);
+	printf("Priority 4\n");
+	uthread_exit();
 }

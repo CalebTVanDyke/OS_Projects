@@ -2,6 +2,17 @@
 #ifndef UTHREAD_H
 #define UTHREAD_H 1
 
+#include <ucontext.h>
+#include <sys/time.h>
+
+/**
+*	This struct defines all of the characteristics associated with one user thread
+**/
+typedef struct {
+	int threadID;
+	ucontext_t* ucp;
+	struct timeval time_ran;
+} uthread_t;
 /**
  * This is used to initialized the user thread library
  *
