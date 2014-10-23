@@ -24,7 +24,7 @@ pqueue_t* init_queue(int size);
  *		@param data the data to be added
  *		@param priority the priority of the data to be added
  */
-void enqueue(pqueue_t* pqueue, ucontext_t* context, int priority);
+void enqueue(pqueue_t* pqueue, uthread_t* thread);
 
 /**
  *  Returns the front of the priority queue but does not remove it

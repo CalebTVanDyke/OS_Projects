@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "uthread.h"
 #include <stdlib.h>
+#include <sys/syscall.h>
 
 void prior1();
 void prior2();
@@ -16,22 +17,28 @@ int main(int argc, char * argv[]){
 }
 
 void prior1(){
-	sleep(1);
-	printf("Priority 1\n");
+	int i = 0;
+	for(i = 1; i > 0; i++);
+	uthread_yield();
+	printf("Thread 1\n");
 	uthread_exit();
 }
 void prior2(){
-	sleep(1);
-	printf("Priority 2\n");
+	int i = 0;
+	for(i = 1; i > 0; i++);
+	printf("Thread 2\n");
 	uthread_exit();
 }
 void prior3(){
-	sleep(1);
-	printf("Priority 3\n");
+	int i = 0;
+	for(i = 1; i > 0; i++);
+	printf("Thread 3\n");
 	uthread_exit();
 }
 void prior4(){
-	sleep(1);
-	printf("Priority 4\n");
+	int i = 0;
+	for(i = 1; i > 0; i++);
+	uthread_yield();
+	printf("Thread 4\n");
 	uthread_exit();
 }

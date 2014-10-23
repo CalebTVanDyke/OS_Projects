@@ -11,7 +11,8 @@
 typedef struct {
 	int threadID;
 	ucontext_t* ucp;
-	struct timeval time_ran;
+	struct timeval* time_ran;
+	struct timeval* start_time;
 } uthread_t;
 /**
  * This is used to initialized the user thread library

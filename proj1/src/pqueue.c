@@ -1,10 +1,21 @@
 #include "pqueue.h"
 #include <stdlib.h>
 #include <sys/time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 /** PRIVATE METHOD DEFINITIONS **/
 
+/**
+ * Perculates the last element of the queue up as far as it should go
+ * @param pqueue
+ */
 void perculateUp(pqueue_t* pqueue);
+/**
+ * Perculates the top element down as far as it should go based on the time
+ * it has ran and if the time is the same it will go based on FIFO
+ * @param pqueue
+ */
 void perculateDown(pqueue_t* pqueue);
 void pqueue_swap(pqueue_t* pqueue, int first, int second);
 
@@ -18,16 +29,11 @@ pqueue_t* init_queue(int size){
 	return pqueue;
 }
 
-void enqueue(pqueue_t* pqueue, ucontext_t* context, int ran){
+void enqueue(pqueue_t* pqueue, uthread_t* thread){
 	if(pqueue->size == pqueue->max_size){
 		//RESIZE THE QUEUE
 		return;
 	}
-	uthread_t* thread = malloc(sizeof(uthread_t));
-	thread->ucp = context;
-	thread->time_ran.tv_sec = 0;
-	thread->time_ran.tv_usec = 0;
-	thread->threadID = pqueue->size;
 	pqueue->queue[pqueue->size] = thread;
 	pqueue->size++;
 	perculateUp(pqueue);
@@ -67,16 +73,21 @@ void perculateDown(pqueue_t * pqueue){
 	int parent = 0;
 	int child = 2 * parent + 1;
 	while(child < pqueue->size){
-		if(child + 1 < pqueue->size &&  timercmp(pqueue->queue[parent]->time_ran, pqueue->queue[child]->time_ran, ==)){
-			if(pqueue->queue[child]->threadID > pqueue->queue[child + 1]->threadID){
+		if(child + 1 < pqueue->size && timercmp(pqueue->queue[child + 1]->time_ran, pqueue->queue[child]->time_ran, <=)){
+			if(timercmp(pqueue->queue[child + 1]->time_ran, pqueue->queue[child]->time_ran, ==)){
+				if(pqueue->queue[child + 1]->threadID < pqueue->queue[child]->threadID){
+					child++;
+				}
+			}else{
 				child++;
 			}
 		}
-		else if(child + 1 < pqueue->size && timercmp(pqueue->queue[parent]->time_ran, pqueue->queue[child]->time_ran, >)){
-			child++;
+		if(timercmp(pqueue->queue[parent]->time_ran, pqueue->queue[child]->time_ran, ==)){
+			if(pqueue->queue[parent]->threadID < pqueue->queue[child]->threadID){
+				break;
+			}
 		}
-		if(timeCmp >= 0
-			 && pqueue->queue[child]->threadID >= pqueue->queue[parent]->threadID){
+		else if(timercmp(pqueue->queue[parent]->time_ran, pqueue->queue[child]->time_ran, <)){
 			break;
 		}
 		pqueue_swap(pqueue, child, parent);
