@@ -42,4 +42,6 @@ uthread_t* peek(pqueue_t* pqueue);
  */
 uthread_t* dequeue(pqueue_t* pqueue);
 
+void printQueue(pqueue_t* pqueue);
+
 #endif

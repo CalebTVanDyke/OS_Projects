@@ -1,44 +1,55 @@
-#include <stdio.h>
+#define _GNU_SOURCE
 #include "uthread.h"
-#include <stdlib.h>
-#include <sys/syscall.h>
+#include <math.h>
+#include <semaphore.h>
+#include <stdio.h>
 
-void prior1();
-void prior2();
-void prior3();
-void prior4();
+int n_threads=1;
+int myid=0;
+sem_t mutex;
 
-int main(int argc, char * argv[]){
-	system_init(1);
-	uthread_create(prior1);
-	uthread_create(prior2);
-	uthread_create(prior3);
-	uthread_create(prior4);
+void do_something()
+{
+        int id,i,j;
+
+        sem_wait(&mutex);
+
+        id=myid;
+        myid++;
+        printf("This is ult %d\n", id);
+
+        if(n_threads<6){
+                n_threads++;
+                sem_post(&mutex);
+
+                uthread_create(do_something);
+        }else sem_post(&mutex);
+
+        if(id%2==0)
+                for(j=0;j<100;j++)
+                        for(i=0;i<1000000;i++) sqrt(i*119.89);
+
+        printf("This is ult %d again\n", id);
+
+        uthread_yield();
+
+        printf("This is ult %d once more\n", id);
+
+        if(id%2==0)
+                for(j=0;j<100;j++)
+                        for(i=0;i<1000000;i++) sqrt(i*119.89);
+
+        printf("This is ult %d exit\n", id);
+
+        uthread_exit();
 }
 
-void prior1(){
-	int i = 0;
-	for(i = 1; i > 0; i++);
-	uthread_yield();
-	printf("Thread 1\n");
-	uthread_exit();
-}
-void prior2(){
-	int i = 0;
-	for(i = 1; i > 0; i++);
-	printf("Thread 2\n");
-	uthread_exit();
-}
-void prior3(){
-	int i = 0;
-	for(i = 1; i > 0; i++);
-	printf("Thread 3\n");
-	uthread_exit();
-}
-void prior4(){
-	int i = 0;
-	for(i = 1; i > 0; i++);
-	uthread_yield();
-	printf("Thread 4\n");
-	uthread_exit();
+main()
+{
+        int i;
+        system_init(1);
+        setbuf(stdout,NULL);
+        sem_init(&mutex,0,1);
+        uthread_create(do_something);
+        uthread_exit();
 }

@@ -1,7 +1,7 @@
 all: testfile
 
 testfile: main.o pqueue.o uthread.o
-	gcc -g -o test main.o pqueue.o uthread.o -pthread
+	gcc -g -o test main.o pqueue.o uthread.o -pthread -lm
 
 main.o: main.c
 	gcc -c main.c

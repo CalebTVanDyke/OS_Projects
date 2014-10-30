@@ -57,6 +57,15 @@ uthread_t* dequeue(pqueue_t* pqueue){
 	return ret;
 }
 
+void printQueue(pqueue_t* pqueue){
+	printf("------------\n");
+	int i = 0;
+	for(i = 0; i < pqueue->size; i++){
+		printf("thread:%d  time_ran:%ld.%06ld\n\n", pqueue->queue[i]->threadID, pqueue->queue[i]->time_ran->tv_sec, pqueue->queue[i]->time_ran->tv_usec);
+	}
+	printf("------------\n");
+}
+
 /** PRIVATE METHOD IMPLEMENTATIONS **/
 
 void perculateUp(pqueue_t * pqueue){
