@@ -37,6 +37,14 @@ void uthread_yield();
  *  All user applications should call this before a user thread ends
  */
 void uthread_exit();
-
-
+/**
+ * Compare to user threads.  Comparision is based on how long the threads have been running
+ * and the threadIDs which is used to determine when they were first started
+ * @param  ut1 
+ * @param  ut2 
+ * @return     ut1 > ut2 = 1
+ *             ut1 < ut2 = -1
+ *             ut1 = ut2 = 0
+ */
+int uthread_compare(uthread_t* ut1, uthread_t* ut2);
 #endif

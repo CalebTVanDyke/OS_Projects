@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <stdio.h>
 
 /** PRIVATE METHOD DEFINITIONS **/
 
@@ -30,9 +31,16 @@ pqueue_t* init_queue(int size){
 }
 
 void enqueue(pqueue_t* pqueue, uthread_t* thread){
+	//If the queue has reached its current capacity double the capacity
 	if(pqueue->size == pqueue->max_size){
-		//RESIZE THE QUEUE
-		return;
+		pqueue->max_size = pqueue->max_size * 2;
+		uthread_t** newQueue = malloc(sizeof(uthread_t*) * pqueue->max_size);
+		int i = 0;
+		for(i = 0; i < pqueue->size; i++){
+			newQueue[i] = pqueue->queue[i];
+		}
+		free(pqueue->queue);
+		pqueue->queue = newQueue;
 	}
 	pqueue->queue[pqueue->size] = thread;
 	pqueue->size++;
@@ -71,7 +79,7 @@ void printQueue(pqueue_t* pqueue){
 void perculateUp(pqueue_t * pqueue){
 	int child = pqueue->size - 1;
 	int parent = (child - 1) / 2;
-	while(timercmp(pqueue->queue[parent]->time_ran, pqueue->queue[child]->time_ran, >)){
+	while(uthread_compare(pqueue->queue[parent], pqueue->queue[child]) > 0){
 		pqueue_swap(pqueue, child, parent);
 		child = parent;
 		parent = (child - 1) / 2;
@@ -82,21 +90,10 @@ void perculateDown(pqueue_t * pqueue){
 	int parent = 0;
 	int child = 2 * parent + 1;
 	while(child < pqueue->size){
-		if(child + 1 < pqueue->size && timercmp(pqueue->queue[child + 1]->time_ran, pqueue->queue[child]->time_ran, <=)){
-			if(timercmp(pqueue->queue[child + 1]->time_ran, pqueue->queue[child]->time_ran, ==)){
-				if(pqueue->queue[child + 1]->threadID < pqueue->queue[child]->threadID){
-					child++;
-				}
-			}else{
-				child++;
-			}
+		if(child + 1 < pqueue->size && uthread_compare(pqueue->queue[child + 1], pqueue->queue[child]) < 0){
+			child++;
 		}
-		if(timercmp(pqueue->queue[parent]->time_ran, pqueue->queue[child]->time_ran, ==)){
-			if(pqueue->queue[parent]->threadID < pqueue->queue[child]->threadID){
-				break;
-			}
-		}
-		else if(timercmp(pqueue->queue[parent]->time_ran, pqueue->queue[child]->time_ran, <)){
+		if(uthread_compare(pqueue->queue[parent], pqueue->queue[child]) < 0){
 			break;
 		}
 		pqueue_swap(pqueue, child, parent);
