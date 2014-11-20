@@ -1,19 +1,55 @@
+#define _GNU_SOURCE
+#include "uthread.h"
+#include <math.h>
+#include <semaphore.h>
 #include <stdio.h>
-#include <sched.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
 
-int runOnAThread();
+int n_threads=1;
+int myid=0;
+sem_t mutex;
 
-int main(int argc, char * argv[]){
-    void * child_stack;
-    child_stack = (void*)malloc(16384);
-    clone(runOnAThread, child_stack, CLONE_VM|CLONE_FILES, NULL);
-    sleep(1);
-    printf("IN THE MAIN METHOD");
+void do_something()
+{
+        int id,i,j;
+
+        sem_wait(&mutex);
+
+        id=myid;
+        myid++;
+        printf("This is ult %d\n", id);
+
+        if(n_threads<6){
+                n_threads++;
+                sem_post(&mutex);
+
+                uthread_create(do_something);
+        }else sem_post(&mutex);
+
+        if(id%2==0)
+                for(j=0;j<100;j++)
+                        for(i=0;i<1000000;i++) sqrt(i*119.89);
+
+        printf("This is ult %d again\n", id);
+
+        uthread_yield();
+
+        printf("This is ult %d once more\n", id);
+
+        if(id%2==0)
+                for(j=0;j<100;j++)
+                        for(i=0;i<1000000;i++) sqrt(i*119.89);
+
+        printf("This is ult %d exit\n", id);
+
+        uthread_exit();
 }
 
-int runOnAThread(){
-    printf("IN THE THREAD");
+main()
+{
+        int i;
+        system_init(1);
+        setbuf(stdout,NULL);
+        sem_init(&mutex,0,1);
+        uthread_create(do_something);
+        uthread_exit();
 }
