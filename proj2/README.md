@@ -21,39 +21,39 @@ For simplicity, no TLB will be simulated.
 The simulated ith user process will read the logical addresses in the ith file one by one, and for each address, it will simulate that it is accessing the address. That is, it submits the local address to the memory manger thread, who needs to extract the page number of the address. Then:
 - If the page is in the simulated physical main memory, a message as follows will beoutputed:
 
-[Process i] accesses address x (page number = p, page offset=d) in main memory (frame number = f).
+> [Process i] accesses address x (page number = p, page offset=d) in main memory (frame number = f).
 
 - If the page is not found in the simulated physical main memory, triggering a page fault will be simulated. Specifically, the page fault handler thread should be notified to execute the demand paging strategy:
 
 - Firstly, try to find a free frame in the main memory. A message as follows should be outputed:
 
-[Process i] accesses address x (page number = p, page offset = d) not in main memory.
+> [Process i] accesses address x (page number = p, page offset = d) not in main memory.
 
 - If there is no free frame found, the LRU algorithm should be used to determine which page should be replaced. One of the following messages should be output:
 
 - When a free frame is found:
 
-[Process i] finds a free frame in main memory (frame number = f).
+> [Process i] finds a free frame in main memory (frame number = f).
 
 - Otherwise: 
 
-[Process i] replaces a frame (frame number = f) from the main memory.
+> [Process i] replaces a frame (frame number = f) from the main memory.
 
 - Then, sleep(1) should be called to simulate that the time needed to swap the demanded page into the main memory. Note that, the underlying OS may swap the sleeping thread out and swithes to run another thread. The following message should be output before calling sleep(1):
 
-[Process i] issues an I/O operation to swap in demanded page (page number = p).
+> [Process i] issues an I/O operation to swap in demanded page (page number = p).
 
 - When the thread becomes active from the sleep, the page table of the user process that it is simulating should be updated accordingly. Also, the following message should be outputed:
 
-[Process i] demanded page (page number =p) has been swapped in main memory (frame number = f).
+> [Process i] demanded page (page number =p) has been swapped in main memory (frame number = f).
 
 - Finally, the interrupted address access should be resumed and completed.
 
-[Process i] accesses address x (page number = p, page offset =d) in main memory (frame number = f).
+> [Process i] accesses address x (page number = p, page offset =d) in main memory (frame number = f).
 
 After all addresses in the ith file have been accessed, the ith thread (a.k.a., the ith user processsimulated by it) will terminate. Before termination, it should output the following message:
 
-[Process i] ends. 
+> [Process i] ends. 
 
 ##Notes:
 - The execution order of the concurrent threads (a. k. a., their simuated user processes) is determined by the underlying Linux OS that the simulator is running on. So, you do not need to schedule their executions. 
@@ -74,13 +74,13 @@ to simulate the running of 10 user processes, where the page/frame size is 1024 
 
 - In each address file address_i.txt contains, each line contains only one address. For example, the content of file address_1.txt is as follows:
 
-1024
+> 1024
 
-2048
+> 2048
 
-3072
+> 3072
 
-4079
+> 4079
 
 ##Other Instructions
 - Your code should compile successfully in Pyrite. Otherwise, you may receive no points. Your program can be written in C, C++, or Java. 
