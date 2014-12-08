@@ -1,0 +1,9 @@
+#! /bin/bash
+
+if [ "$1" = "clean" ]; then
+    rm -f simVM.jar
+    rm -f *.class
+else
+    javac *.java
+    jar cfe simVM.jar simVM *.class
+fi
